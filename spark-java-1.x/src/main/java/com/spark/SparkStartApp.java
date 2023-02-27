@@ -11,17 +11,16 @@ import org.apache.spark.api.java.function.VoidFunction;
 import java.util.Collections;
 
 /**
- *
  * ./bin/spark-submit  --class SparkStartApp\
- *     --master yarn \
- *     --conf spark.eventLog.dir=hdfs:///spark-history \
- *     --deploy-mode cluster \
- *     --driver-memory 2g \
- *     --executor-memory 2g \
- *     --executor-cores 1 \
- *     --queue default \
- *    /tmp/spark-app-jar-with-dependencies.jar \
- *     10
+ * --master yarn \
+ * --conf spark.eventLog.dir=hdfs:///spark-history \
+ * --deploy-mode cluster \
+ * --driver-memory 2g \
+ * --executor-memory 2g \
+ * --executor-cores 1 \
+ * --queue default \
+ * /tmp/spark-app-jar-with-dependencies.jar \
+ * 10
  *
  * @author zhangxuecheng4441
  * @date 2022/9/9/009 10:41
@@ -37,20 +36,22 @@ public class SparkStartApp {
 
         try {
             //JavaRDD<String> rddStr = sc.textFile("file:///D:/tmp.txt");
-            JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1","2","3","3","3","2","2","3"));
+            JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1", "2", "3", "3", "3", "2", "2", "3"));
             long count = rddStr.count();
-            System.out.println("count = " + count);
+            log.error("find count = {}", count);
             JavaRDD<String> listStrRdd = rddStr.flatMap(new FlatMapFunction<String, String>() {
                 private static final long serialVersionUID = 1L;
+
                 @Override
                 public Iterable<String> call(String s) {
-                    log.info("print :{}",s);
+                    log.warn("print >>>>>>>>>>>>>> :{}", s);
                     return Collections.singletonList(s);
                 }
             });
 
             listStrRdd.foreach(new VoidFunction<String>() {
                 private static final long serialVersionUID = 1L;
+
                 @Override
                 public void call(String x) throws Exception {
                     System.out.println(x);

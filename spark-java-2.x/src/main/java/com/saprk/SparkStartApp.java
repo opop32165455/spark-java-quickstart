@@ -1,27 +1,24 @@
 package com.saprk;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.ListUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.VoidFunction;
+import scala.Tuple2;
 
-import java.util.Iterator;
+import java.util.Arrays;
 
 /**
- *
  * ./bin/spark-submit  --class SparkStartApp\
- *     --master yarn \
- *     --conf spark.eventLog.dir=hdfs:///spark-history \
- *     --deploy-mode cluster \
- *     --driver-memory 2g \
- *     --executor-memory 2g \
- *     --executor-cores 1 \
- *     --queue default \
- *    /tmp/spark-app-jar-with-dependencies.jar \
- *     10
+ * --master yarn \
+ * --conf spark.eventLog.dir=hdfs:///spark-history \
+ * --deploy-mode cluster \
+ * --driver-memory 2g \
+ * --executor-memory 2g \
+ * --executor-cores 1 \
+ * --queue default \
+ * /tmp/spark-app-jar-with-dependencies.jar \
+ * 10
  *
  * @author zhangxuecheng4441
  * @date 2022/9/9/009 10:41
@@ -29,37 +26,22 @@ import java.util.Iterator;
 public class SparkStartApp {
 
     public static void main(String[] args) {
-        SparkConf conf = new SparkConf().setAppName("Spark Java");
-        conf.setMaster("local[2]");
-
+        // 创建SparkConf对象
+        SparkConf conf = new SparkConf().setAppName("QuickStart").setMaster("local[2]");
+        // 创建JavaSparkContext对象
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        try {
-            //JavaRDD<String> rddStr = sc.textFile("file:///D:/tmp.txt");
-            JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1","2","3"));
-            long count = rddStr.count();
-            System.out.println("count = " + count);
-            JavaRDD<String> listStrRdd = rddStr.flatMap(new FlatMapFunction<String, String>() {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public Iterator<String> call(String s) {
-                    return ListUtil.toList(s).listIterator();
-                }
-            });
+        JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1", "2", "3", "3", "3", "2", "2", "3"));
+        //JavaRDD<String> rddStr = sc.textFile("hdfs://...");
 
-            listStrRdd.foreach(new VoidFunction<String>() {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public void call(String x) throws Exception {
-                    System.out.println(x);
-                }
-            });
+        // 使用JavaSparkContext创建RDD
+        rddStr.flatMap(line -> Arrays.asList(line.split(" ")).iterator())
+                .mapToPair(word -> new Tuple2<>(word, 1))
+                .reduceByKey(Integer::sum)
+                .collect()
+                .forEach(System.out::println);
 
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        // 关闭JavaSparkContext
         sc.close();
     }
 }
