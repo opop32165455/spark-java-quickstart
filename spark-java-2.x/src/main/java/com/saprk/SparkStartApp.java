@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 
 import java.util.Arrays;
@@ -36,7 +37,12 @@ public class SparkStartApp {
 
         // 使用JavaSparkContext创建RDD
         rddStr.flatMap(line -> Arrays.asList(line.split(" ")).iterator())
-                .mapToPair(word -> new Tuple2<>(word, 1))
+                .mapToPair(new PairFunction<String, String, Integer>() {
+                    @Override
+                    public Tuple2<String, Integer> call(String word) throws Exception {
+                        return new Tuple2<>(word, 1);
+                    }
+                })
                 .reduceByKey(Integer::sum)
                 .collect()
                 .forEach(System.out::println);
