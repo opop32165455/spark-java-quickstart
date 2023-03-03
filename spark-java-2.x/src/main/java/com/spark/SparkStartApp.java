@@ -1,6 +1,6 @@
-package com.saprk;
+package com.spark;
 
-import cn.hutool.core.collection.CollUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -24,16 +24,19 @@ import java.util.Arrays;
  * @author zhangxuecheng4441
  * @date 2022/9/9/009 10:41
  */
+@Slf4j
 public class SparkStartApp {
 
     public static void main(String[] args) {
         // 创建SparkConf对象
-        SparkConf conf = new SparkConf().setAppName("QuickStart").setMaster("local[2]");
+        SparkConf conf = new SparkConf().setAppName("Spark2.4 Start");
+
+        //conf.setMaster("local[2]");
         // 创建JavaSparkContext对象
         JavaSparkContext sc = new JavaSparkContext(conf);
 
-        JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1", "2", "3", "3", "3", "2", "2", "3"));
-        //JavaRDD<String> rddStr = sc.textFile("hdfs://...");
+        //JavaRDD<String> rddStr = sc.parallelize(CollUtil.newArrayList("1", "2", "3", "3", "3", "2", "2", "3"));
+        JavaRDD<String> rddStr = sc.textFile("hdfs:///tmp/zxc/tmp.txt");
 
         // 使用JavaSparkContext创建RDD
         rddStr.flatMap(line -> Arrays.asList(line.split(" ")).iterator())
@@ -45,7 +48,9 @@ public class SparkStartApp {
                 })
                 .reduceByKey(Integer::sum)
                 .collect()
-                .forEach(System.out::println);
+                .forEach(
+                        s -> log.error("print log:{}", s)
+                );
 
         // 关闭JavaSparkContext
         sc.close();
