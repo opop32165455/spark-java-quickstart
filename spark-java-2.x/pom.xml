@@ -14,8 +14,9 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <scala.version>2.11</scala.version>
+        <spark.scala.version>2.11</spark.scala.version>
         <spark.version>2.4.8</spark.version>
+        <scala.version>2.11.8</scala.version>
     </properties>
 
 
@@ -23,7 +24,7 @@
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-core -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.version}</artifactId>
+            <artifactId>spark-core_${spark.scala.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -79,7 +80,6 @@
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
-                            <!--<mainClass>cn.rzx.kafka.NewsExport2Crawl3KafkaCli</mainClass>-->
                             <mainClass>MainApp</mainClass>
                         </manifest>
                     </archive>
