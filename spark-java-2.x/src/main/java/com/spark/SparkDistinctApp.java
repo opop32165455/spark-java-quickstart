@@ -1,8 +1,8 @@
 package com.spark;
 
 import cn.hutool.core.util.StrUtil;
+import com.spark.utils.SparkUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -27,10 +27,8 @@ import java.util.Arrays;
 public class SparkDistinctApp {
 
     public static void main(String[] args) {
-        // 创建SparkConf对象
-        SparkConf conf = new SparkConf().setAppName("Spark2.4 Distinct");
-
-        JavaSparkContext sc = new JavaSparkContext(conf);
+        // 创建JavaSparkContext对象
+        JavaSparkContext sc = SparkUtils.getLocalSparkContext(SparkStartApp.class);
 
         JavaRDD<String> rddStr = sc.textFile("hdfs:///tmp/zxc/friend-user_id.txt");
 
